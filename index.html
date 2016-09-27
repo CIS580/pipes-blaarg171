@@ -1,13 +1,38 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Pipes</title>
-    <link type="text/css" rel="stylesheet" href="game.css" />
-  </head>
-  <body>
-    <h1>Play Pipes</h1>
-    <canvas id="screen" width="1024" height="860"></canvas>
+
+<head>
+  <title>Pipes</title>
+  <link type="text/css" rel="stylesheet" href="game.css" />
+</head>
+
+<body>
+  <h1>Play Pipes</h1>
+  <canvas id="screen" width="1024" height="860"></canvas>
+
+  <table id="sidebar">
+    <col width="150">
+    <tr>
+      <th>Current Score: </th>
+      <th id="scoreCurrent">0</th>
+    </tr>
+    <tr>
+      <th>High Score: </th>
+      <th id="scoreHigh">0</th>
+    </tr>
+    <td><br></td>
+    <tr>
+      <th><a id="newGame" onclick="initializeGame()" href="#">New Game</a></th>
+    </tr>
+  </table>
+
+  <div>
     <h2>Instructions</h2>
-    <script type="text/javascript" src="bundle.js"></script>
-  </body>
+    <p>
+      
+    </p>
+  </div>
+  <script type="text/javascript" src="bundle.js"></script>
+</body>
+
 </html>

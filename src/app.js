@@ -6,10 +6,10 @@ const Game = require('./game');
 /* Global variables */
 var canvas = document.getElementById('screen');
 var game = new Game(canvas, update, render);
-var image = new Image();
-image.src = 'assets/pipes.png';
+var spritesheet = new Image();
+spritesheet.src = 'assets/pipes.png';
 
-canvas.onclick = function(event) {
+canvas.onclick = function (event) {
   event.preventDefault();
   // TODO: Place or rotate pipe tile
 }
@@ -19,11 +19,10 @@ canvas.onclick = function(event) {
  * Advances the game in sync with the refresh rate of the screen
  * @param {DOMHighResTimeStamp} timestamp the current time
  */
-var masterLoop = function(timestamp) {
+var masterLoop = function (timestamp) {
   game.loop(timestamp);
   window.requestAnimationFrame(masterLoop);
 }
-masterLoop(performance.now());
 
 
 /**
@@ -53,3 +52,18 @@ function render(elapsedTime, ctx) {
   // TODO: Render the board
 
 }
+
+window.onkeydown = function (event) {
+  switch (event.keyCode) {
+    //Space
+    case 32:
+      event.preventDefault();
+      if (mInitialized) game.start(masterLoop);
+      break;
+
+  }
+}
+
+//click event
+
+game.initialize();

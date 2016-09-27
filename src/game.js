@@ -24,9 +24,14 @@ function Game(screen, updateFunction, renderFunction) {
   this.backBuffer.height = screen.height;
   this.backCtx = this.backBuffer.getContext('2d');
 
+  this.paused = false;
+  this.gameOver = false;
+  this.initialized = false;
+
+  this.level = 1;
+
   // Start the game loop
   this.oldTime = performance.now();
-  this.paused = false;
 }
 
 /**
@@ -34,7 +39,7 @@ function Game(screen, updateFunction, renderFunction) {
  * Pause or unpause the game
  * @param {bool} pause true to pause, false to start
  */
-Game.prototype.pause = function(flag) {
+Game.prototype.pause = function (flag) {
   this.paused = (flag == true);
 }
 
@@ -43,14 +48,23 @@ Game.prototype.pause = function(flag) {
  * The main game loop.
  * @param{time} the current time as a DOMHighResTimeStamp
  */
-Game.prototype.loop = function(newTime) {
+Game.prototype.loop = function (newTime) {
   var game = this;
   var elapsedTime = newTime - this.oldTime;
   this.oldTime = newTime;
 
-  if(!this.paused) this.update(elapsedTime);
+  if (!this.paused) this.update(elapsedTime);
   this.render(elapsedTime, this.frontCtx);
 
   // Flip the back buffer
   this.frontCtx.drawImage(this.backBuffer, 0, 0);
+}
+
+Game.prototype.initialize = function () {
+
+}
+
+Game.prototype.start = function (loop) {
+  this.initialized = false;
+  window.requestAnimationFrame(loop);
 }
