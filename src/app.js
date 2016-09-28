@@ -9,11 +9,6 @@ var game = new Game(canvas, update, render);
 var spritesheet = new Image();
 spritesheet.src = 'assets/pipes.png';
 
-canvas.onclick = function (event) {
-  event.preventDefault();
-  // TODO: Place or rotate pipe tile
-}
-
 /**
  * @function masterLoop
  * Advances the game in sync with the refresh rate of the screen
@@ -58,12 +53,16 @@ window.onkeydown = function (event) {
     //Space
     case 32:
       event.preventDefault();
-      if (mInitialized) game.start(masterLoop);
+      if (game.initialized) game.start(masterLoop);
       break;
 
   }
 }
 
-//click event
+canvas.onclick = function (event) {
+  event.preventDefault();
+  // TODO: Place or rotate pipe tile
+  var clickPos = { x: event.x, y: event.y };
+}
 
 game.initialize();
