@@ -63,12 +63,8 @@ canvas.onclick = function (event) {
   var clientRect = canvas.getBoundingClientRect();
   clickPos.x = Math.floor((event.clientX - clientRect.left) / (clientRect.right - clientRect.left) * canvas.width);
   clickPos.y = Math.floor((event.clientY - clientRect.top) / (clientRect.bottom - clientRect.top) * canvas.height);
-  clickPos = board.getTileFromClick(clickPos);
-  board.tiles[clickPos.x][clickPos.y] = "cross";
-}
 
-function rollRandom(minimum, maximum) {
-  return Math.floor(Math.random() * (maximum - minimum) + minimum);
+  board.handleClick(clickPos);
 }
 
 game.initialize();

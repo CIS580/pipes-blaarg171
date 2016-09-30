@@ -9,6 +9,7 @@ function Board(width, height, tileSize) {
   this.spritesheet = new Image();
   this.spritesheet.src = encodeURI('assets/pipes.png');
   this.spriteSize = 32;
+  this.nextPipe = "";
 
   this.tiles = new Array(this.width);
   for (var i = 0; i < this.width; i++) {
@@ -100,8 +101,66 @@ Board.prototype.render = function (ctx) {
   }
 }
 
-Board.prototype.getTileFromClick = function (position) {
-  var x = Math.floor(position.x / this.tileSize);
-  var y = Math.floor(position.y / this.tileSize);
-  return { x: x, y: y };
+Board.prototype.handleClick = function (position) {
+  var clickPos = new Object();
+  clickPos.x = Math.floor(position.x / this.tileSize);
+  clickPos.y = Math.floor(position.y / this.tileSize);
+
+  if (this.tiles[clickPos.x][clickPos.y] != "empty") return;
+  this.tiles[clickPos.x][clickPos.y] = this.nextPipe;
+  newNextPipe();
 }
+
+function newNextPipe() {
+  var roll = rollRandom(0, 12);
+  switch (roll) {
+    case 0:
+      this.nextPipe = "cross";
+      break;
+
+    case 1:
+      this.nextPipe = "vertical";
+      break;
+
+    case 2:
+      this.nextPipe = "horizontal";
+      break;
+
+    case 3:
+      this.nextPipe = "elbow_rd";
+      break;
+
+    case 4:
+      this.nextPipe = "elbow_ru";
+      break;
+
+    case 5:
+      this.nextPipe = "elbow_lu";
+      break;
+
+    case 6:
+      this.nextPipe = "elbow_ld";
+      break;
+
+    case 7:
+      this.nextPipe = "t_d";
+      break;
+
+    case 8:
+      this.nextPipe = "t_r";
+      break;
+
+    case 9:
+      this.nextPipe = "t_u";
+      break;
+
+    case 10:
+      this.nextPipe = "t_l";
+      break;
+  }
+}
+
+function rollRandom(minimum, maximum) {
+  return Math.floor(Math.random() * (maximum - minimum) + minimum);
+}
+
