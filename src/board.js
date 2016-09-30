@@ -101,5 +101,7 @@ Board.prototype.render = function (ctx) {
 }
 
 Board.prototype.getTileFromClick = function (position) {
-
+  var x = Math.floor(position.x / this.tileSize);
+  var y = Math.floor(position.y / this.tileSize);
+  return { x: x, y: y };
 }

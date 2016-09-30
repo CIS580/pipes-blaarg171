@@ -51,18 +51,6 @@ window.onkeydown = function (event) {
     //Space
     case 32:
       event.preventDefault();
-
-      //debug
-      board.tiles[1][1] = "cross";
-      board.tiles[2][1] = "horizontal";
-      board.tiles[3][1] = "t_d";
-      board.tiles[3][2] = "vertical";
-      board.tiles[3][3] = "elbow_lu";
-      board.tiles[2][3] = "elbow_rd";
-      board.tiles[2][4] = "elbow_ru";
-      board.tiles[3][4] = "elbow_ld";
-      //debug
-
       if (game.initialized) game.start(masterLoop);
       break;
   }
@@ -71,10 +59,12 @@ window.onkeydown = function (event) {
 canvas.onclick = function (event) {
   event.preventDefault();
   // TODO: Place or rotate pipe tile
-  var clickPos = { x: event.x, y: event.y };
-  //console.log(clickPos.x + ", " + clickPos.y);
+  var clickPos = new Object();
+  var clientRect = canvas.getBoundingClientRect();
+  clickPos.x = Math.floor((event.clientX - clientRect.left) / (clientRect.right - clientRect.left) * canvas.width);
+  clickPos.y = Math.floor((event.clientY - clientRect.top) / (clientRect.bottom - clientRect.top) * canvas.height);
   clickPos = board.getTileFromClick(clickPos);
-
+  board.tiles[clickPos.x][clickPos.y] = "cross";
 }
 
 function rollRandom(minimum, maximum) {
