@@ -2,12 +2,12 @@
 
 /* Classes */
 const Game = require('./game');
+const Board = require('./board');
 
 /* Global variables */
 var canvas = document.getElementById('screen');
 var game = new Game(canvas, update, render);
-var spritesheet = new Image();
-spritesheet.src = 'assets/pipes.png';
+var board = new Board(canvas.width, canvas.height, 64);
 
 /**
  * @function masterLoop
@@ -43,9 +43,7 @@ function update(elapsedTime) {
 function render(elapsedTime, ctx) {
   ctx.fillStyle = "#777777";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // TODO: Render the board
-
+  board.render(ctx);
 }
 
 window.onkeydown = function (event) {
@@ -53,9 +51,20 @@ window.onkeydown = function (event) {
     //Space
     case 32:
       event.preventDefault();
+
+      //debug
+      board.tiles[1][1] = "cross";
+      board.tiles[2][1] = "horizontal";
+      board.tiles[3][1] = "t_d";
+      board.tiles[3][2] = "vertical";
+      board.tiles[3][3] = "elbow_lu";
+      board.tiles[2][3] = "elbow_rd";
+      board.tiles[2][4] = "elbow_ru";
+      board.tiles[3][4] = "elbow_ld";
+      //debug
+
       if (game.initialized) game.start(masterLoop);
       break;
-
   }
 }
 
@@ -63,6 +72,13 @@ canvas.onclick = function (event) {
   event.preventDefault();
   // TODO: Place or rotate pipe tile
   var clickPos = { x: event.x, y: event.y };
+  //console.log(clickPos.x + ", " + clickPos.y);
+  clickPos = board.getTileFromClick(clickPos);
+
+}
+
+function rollRandom(minimum, maximum) {
+  return Math.floor(Math.random() * (maximum - minimum) + minimum);
 }
 
 game.initialize();
