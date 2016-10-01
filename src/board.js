@@ -9,7 +9,7 @@ function Board(width, height, tileSize) {
   this.spritesheet = new Image();
   this.spritesheet.src = encodeURI('assets/pipes.png');
   this.spriteSize = 32;
-  this.nextPipe = "";
+  this.nextPipe = newNextPipe();
 
   this.tiles = new Array(this.width);
   for (var i = 0; i < this.width; i++) {
@@ -18,6 +18,10 @@ function Board(width, height, tileSize) {
       this.tiles[i][j] = "empty";
     }
   }
+
+  // TODO > fix duplicate rolls
+  this.tiles[rollRandom(1, 7)][rollRandom(1, 7)] = "start";
+  this.tiles[rollRandom(1, 7)][rollRandom(1, 7)] = "finish";
 }
 
 Board.prototype.render = function (ctx) {
@@ -28,6 +32,16 @@ Board.prototype.render = function (ctx) {
       switch (this.tiles[x][y]) {
         case "empty":
           continue;
+
+        case "start":
+          srcx = 3 * this.spriteSize;
+          srcy = 3 * this.spriteSize;
+          break;
+
+        case "finish":
+          srcx = 3 * this.spriteSize;
+          srcy = 4 * this.spriteSize;
+          break;
 
         case "cross":
           srcx = 0 * this.spriteSize;
@@ -108,55 +122,44 @@ Board.prototype.handleClick = function (position) {
 
   if (this.tiles[clickPos.x][clickPos.y] != "empty") return;
   this.tiles[clickPos.x][clickPos.y] = this.nextPipe;
-  newNextPipe();
+  this.nextPipe = newNextPipe();
 }
 
 function newNextPipe() {
   var roll = rollRandom(0, 12);
   switch (roll) {
     case 0:
-      this.nextPipe = "cross";
-      break;
+      return "cross";
 
     case 1:
-      this.nextPipe = "vertical";
-      break;
+      return "vertical";
 
     case 2:
-      this.nextPipe = "horizontal";
-      break;
+      return "horizontal";
 
     case 3:
-      this.nextPipe = "elbow_rd";
-      break;
+      return "elbow_rd";
 
     case 4:
-      this.nextPipe = "elbow_ru";
-      break;
+      return "elbow_ru";
 
     case 5:
-      this.nextPipe = "elbow_lu";
-      break;
+      return "elbow_lu";
 
     case 6:
-      this.nextPipe = "elbow_ld";
-      break;
+      return "elbow_ld";
 
     case 7:
-      this.nextPipe = "t_d";
-      break;
+      return "t_d";
 
     case 8:
-      this.nextPipe = "t_r";
-      break;
+      return "t_r";
 
     case 9:
-      this.nextPipe = "t_u";
-      break;
+      return "t_u";
 
     case 10:
-      this.nextPipe = "t_l";
-      break;
+      return "t_l";
   }
 }
 

@@ -25,7 +25,7 @@ function Game(screen, updateFunction, renderFunction) {
   this.backCtx = this.backBuffer.getContext('2d');
 
   this.paused = false;
-  this.gameOver = false;
+  this.gameOver = true;
   this.initialized = false;
 
   this.level = 1;
@@ -72,6 +72,7 @@ Game.prototype.initialize = function () {
 
 
   this.initialized = true;
+  this.gameOver = false;
 }
 
 Game.prototype.start = function (loop) {
