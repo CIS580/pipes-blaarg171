@@ -9,7 +9,8 @@ function Board(width, height, tileSize) {
   this.spritesheet = new Image();
   this.spritesheet.src = encodeURI('assets/pipes.png');
   this.spriteSize = 32;
-  this.nextPipe = newNextPipe();
+  this.pipeSet = { index: 0, num: [8, 12] };
+  this.nextPipe = newNextPipe(this.pipeSet.num[this.pipeSet.index]);
 
   this.tiles = new Array(this.width);
   for (var i = 0; i < this.width; i++) {
@@ -19,9 +20,7 @@ function Board(width, height, tileSize) {
     }
   }
 
-  // TODO > fix duplicate rolls
-  this.tiles[rollRandom(1, 7)][rollRandom(1, 7)] = "start";
-  this.tiles[rollRandom(1, 7)][rollRandom(1, 7)] = "finish";
+  setStartFinish(this);
 }
 
 Board.prototype.render = function (ctx) {
@@ -124,7 +123,7 @@ Board.prototype.handleClick = function (position, click) {
     case "left":
       if (this.tiles[clickPos.x][clickPos.y] != "empty") return;
       this.tiles[clickPos.x][clickPos.y] = this.nextPipe;
-      this.nextPipe = newNextPipe();
+      this.nextPipe = newNextPipe(this.pipeSet.num[this.pipeSet.index]);
       break;
 
     case "right":
@@ -183,8 +182,8 @@ Board.prototype.handleClick = function (position, click) {
   }
 }
 
-function newNextPipe() {
-  var roll = rollRandom(0, 12);
+function newNextPipe(max) {
+  var roll = rollRandom(0, max);
   switch (roll) {
     case 0:
       return "cross";
@@ -219,6 +218,24 @@ function newNextPipe() {
     case 10:
       return "t_l";
   }
+}
+
+function setStartFinish(instance) {
+  var start = new Object();
+  var finish = new Object();
+
+  do {
+    start.x = rollRandom(1, 7);
+    start.y = rollRandom(1, 7);
+    finish.x = rollRandom(1, 7);
+    finish.y = rollRandom(1, 7);
+  } while (start == finish);
+
+  instance.start = start;
+  instance.finish = finish;
+
+  instance.tiles[start.x][start.y] = "start";
+  instance.tiles[finish.x][finish.y] = "finish";
 }
 
 function rollRandom(minimum, maximum) {
