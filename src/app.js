@@ -64,12 +64,17 @@ canvas.onclick = function (event) {
   clickPos.x = Math.floor((event.clientX - clientRect.left) / (clientRect.right - clientRect.left) * canvas.width);
   clickPos.y = Math.floor((event.clientY - clientRect.top) / (clientRect.bottom - clientRect.top) * canvas.height);
 
-  board.handleClick(clickPos);
+  board.handleClick(clickPos, "left");
 }
 
 canvas.oncontextmenu = function (event) {
   event.preventDefault();
+  var clickPos = new Object();
+  var clientRect = canvas.getBoundingClientRect();
+  clickPos.x = Math.floor((event.clientX - clientRect.left) / (clientRect.right - clientRect.left) * canvas.width);
+  clickPos.y = Math.floor((event.clientY - clientRect.top) / (clientRect.bottom - clientRect.top) * canvas.height);
 
+  board.handleClick(clickPos, "right");
 }
 
 game.initialize();

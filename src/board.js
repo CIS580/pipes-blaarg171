@@ -115,14 +115,72 @@ Board.prototype.render = function (ctx) {
   }
 }
 
-Board.prototype.handleClick = function (position) {
+Board.prototype.handleClick = function (position, click) {
   var clickPos = new Object();
   clickPos.x = Math.floor(position.x / this.tileSize);
   clickPos.y = Math.floor(position.y / this.tileSize);
 
-  if (this.tiles[clickPos.x][clickPos.y] != "empty") return;
-  this.tiles[clickPos.x][clickPos.y] = this.nextPipe;
-  this.nextPipe = newNextPipe();
+  switch (click) {
+    case "left":
+      if (this.tiles[clickPos.x][clickPos.y] != "empty") return;
+      this.tiles[clickPos.x][clickPos.y] = this.nextPipe;
+      this.nextPipe = newNextPipe();
+      break;
+
+    case "right":
+      switch (this.tiles[clickPos.x][clickPos.y]) {
+        case "vertical":
+          this.tiles[clickPos.x][clickPos.y] = "horizontal";
+          break;
+
+        case "horizontal":
+          this.tiles[clickPos.x][clickPos.y] = "vertical";
+          break;
+
+
+        case "elbow_rd":
+          this.tiles[clickPos.x][clickPos.y] = "elbow_ld";
+          break;
+
+
+        case "elbow_ru":
+          this.tiles[clickPos.x][clickPos.y] = "elbow_rd";
+          break;
+
+
+        case "elbow_lu":
+          this.tiles[clickPos.x][clickPos.y] = "elbow_ru";
+          break;
+
+
+        case "elbow_ld":
+          this.tiles[clickPos.x][clickPos.y] = "elbow_lu";
+          break;
+
+
+        case "t_d":
+          this.tiles[clickPos.x][clickPos.y] = "t_l";
+          break;
+
+
+        case "t_r":
+          this.tiles[clickPos.x][clickPos.y] = "t_d";
+          break;
+
+
+        case "t_u":
+          this.tiles[clickPos.x][clickPos.y] = "t_r";
+          break;
+
+
+        case "t_l":
+          this.tiles[clickPos.x][clickPos.y] = "t_u";
+          break;
+
+
+      }
+      break;
+  }
 }
 
 function newNextPipe() {
