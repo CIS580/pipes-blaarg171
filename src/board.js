@@ -3,6 +3,7 @@
 module.exports = exports = Board;
 
 const Pipe = require('./pipe');
+const MS_PER_FRAME = 1000 / 8;
 
 function Board(width, height, tileSize) {
   this.width = width / tileSize;
@@ -11,6 +12,7 @@ function Board(width, height, tileSize) {
   this.spritesheet = new Image();
   this.spritesheet.src = encodeURI('assets/pipes.png');
   this.spriteSize = 32;
+  this.timer = 0;
   this.pipeSet = { index: 0, num: [8, 12] };
   this.nextPipe = newNextPipe(this.pipeSet.num[this.pipeSet.index]);
 
@@ -24,10 +26,48 @@ function Board(width, height, tileSize) {
 
   setStartFinish(this);
   console.log(this.start.direction + " " + this.finish.direction);
+
+  this.current = { x: this.start.x, y: this.start.y, direction: this.start.direction };
 }
 
 Board.prototype.update = function (time) {
+  this.timer += time;
+  if (this.timer >= MS_PER_FRAME) {
+    this.timer = 0;
+    if (this.tiles[this.current.x][this.current.y].update()) {
+      var next = this.current;
+      var connectDir;
+      switch (this.current.direction) {
+        case "up":
+          next.y -= 1;
+          connectDir = 2;
+          break;
 
+        case "left":
+          next.x -= 1;
+          connectDir = 3
+          break;
+
+        case "down":
+          next.y += 1;
+          connectDir = 0;
+          break;
+
+        case "right":
+          next.x += 1;
+          connectDir = 1;
+          break;
+      }
+      next = this.tiles[next.x][next.y];
+      if (next.connections[connectDir]) {
+        this.current = { x: next.x, y: next.y, direction: this.current.direction };
+        this.tiles[next.x][next.y].direction = this.current.direction;
+      }
+      else{
+        //lose game
+      }
+    }
+  }
 }
 
 Board.prototype.render = function (ctx) {
@@ -36,6 +76,10 @@ Board.prototype.render = function (ctx) {
       var srcx, srcy;
 
       if (this.tiles[x][y] == "empty") continue;
+
+      if (this.tiles[x][y].fillLevel > 0) {
+        ctx.fillRect((x * this.tileSize) + this.tileSize / 2, (y * this.tileSize) + this.tileSize / 2, 2, 2);
+      }
 
       switch (this.tiles[x][y].type) {
         case "start":
@@ -125,7 +169,7 @@ Board.prototype.handleClick = function (position, click) {
       break;
 
     case "right":
-      if (this.tiles[clickPos.x][clickPos.y].percentFilled != 0) return;
+      if (this.tiles[clickPos.x][clickPos.y].fillLevel != 0) return;
       switch (this.tiles[clickPos.x][clickPos.y].type) {
         case "vertical":
           this.tiles[clickPos.x][clickPos.y] = new Pipe("horizontal");
