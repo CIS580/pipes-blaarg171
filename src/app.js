@@ -29,8 +29,7 @@ var masterLoop = function (timestamp) {
  * the number of milliseconds passed since the last frame.
  */
 function update(elapsedTime) {
-
-  // TODO: Advance the fluid
+  board.update(elapsedTime);
 }
 
 /**

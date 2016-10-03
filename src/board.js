@@ -2,6 +2,8 @@
 
 module.exports = exports = Board;
 
+const Pipe = require('./pipe');
+
 function Board(width, height, tileSize) {
   this.width = width / tileSize;
   this.height = height / tileSize;
@@ -21,6 +23,11 @@ function Board(width, height, tileSize) {
   }
 
   setStartFinish(this);
+  console.log(this.start.direction + " " + this.finish.direction);
+}
+
+Board.prototype.update = function (time) {
+
 }
 
 Board.prototype.render = function (ctx) {
@@ -28,10 +35,9 @@ Board.prototype.render = function (ctx) {
     for (var y = 0; y < this.height; y++) {
       var srcx, srcy;
 
-      switch (this.tiles[x][y]) {
-        case "empty":
-          continue;
+      if (this.tiles[x][y] == "empty") continue;
 
+      switch (this.tiles[x][y].type) {
         case "start":
           srcx = 3 * this.spriteSize;
           srcy = 3 * this.spriteSize;
@@ -57,48 +63,40 @@ Board.prototype.render = function (ctx) {
           srcy = 1 * this.spriteSize;
           break;
 
-
         case "elbow_rd":
           srcx = 1 * this.spriteSize;
           srcy = 1 * this.spriteSize;
           break;
-
 
         case "elbow_ru":
           srcx = 1 * this.spriteSize;
           srcy = 2 * this.spriteSize;
           break;
 
-
         case "elbow_lu":
           srcx = 2 * this.spriteSize;
           srcy = 2 * this.spriteSize;
           break;
-
 
         case "elbow_ld":
           srcx = 2 * this.spriteSize;
           srcy = 1 * this.spriteSize;
           break;
 
-
         case "t_d":
           srcx = 1 * this.spriteSize;
           srcy = 3 * this.spriteSize;
           break;
-
 
         case "t_r":
           srcx = 1 * this.spriteSize;
           srcy = 4 * this.spriteSize;
           break;
 
-
         case "t_u":
           srcx = 2 * this.spriteSize;
           srcy = 4 * this.spriteSize;
           break;
-
 
         case "t_l":
           srcx = 2 * this.spriteSize;
@@ -122,61 +120,63 @@ Board.prototype.handleClick = function (position, click) {
   switch (click) {
     case "left":
       if (this.tiles[clickPos.x][clickPos.y] != "empty") return;
-      this.tiles[clickPos.x][clickPos.y] = this.nextPipe;
+      this.tiles[clickPos.x][clickPos.y] = new Pipe(this.nextPipe);
       this.nextPipe = newNextPipe(this.pipeSet.num[this.pipeSet.index]);
       break;
 
     case "right":
-      switch (this.tiles[clickPos.x][clickPos.y]) {
+      if (this.tiles[clickPos.x][clickPos.y].percentFilled != 0) return;
+      switch (this.tiles[clickPos.x][clickPos.y].type) {
         case "vertical":
-          this.tiles[clickPos.x][clickPos.y] = "horizontal";
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("horizontal");
           break;
 
         case "horizontal":
-          this.tiles[clickPos.x][clickPos.y] = "vertical";
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("vertical");
           break;
 
 
         case "elbow_rd":
-          this.tiles[clickPos.x][clickPos.y] = "elbow_ld";
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("elbow_ld");
           break;
 
 
         case "elbow_ru":
-          this.tiles[clickPos.x][clickPos.y] = "elbow_rd";
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("elbow_rd");
           break;
 
 
         case "elbow_lu":
-          this.tiles[clickPos.x][clickPos.y] = "elbow_ru";
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("elbow_ru");
           break;
 
 
         case "elbow_ld":
-          this.tiles[clickPos.x][clickPos.y] = "elbow_lu";
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("elbow_lu");
           break;
 
 
         case "t_d":
-          this.tiles[clickPos.x][clickPos.y] = "t_l";
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("t_l");
           break;
 
 
         case "t_r":
-          this.tiles[clickPos.x][clickPos.y] = "t_d";
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("t_d");
           break;
 
 
         case "t_u":
-          this.tiles[clickPos.x][clickPos.y] = "t_r";
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("t_r");
           break;
 
 
         case "t_l":
-          this.tiles[clickPos.x][clickPos.y] = "t_u";
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("t_u");
           break;
 
-
+        default:
+          return;
       }
       break;
   }
@@ -231,11 +231,30 @@ function setStartFinish(instance) {
     finish.y = rollRandom(1, 7);
   } while (start == finish);
 
+  start.direction = randomDirection();
+  finish.direction = randomDirection();
+
   instance.start = start;
   instance.finish = finish;
 
-  instance.tiles[start.x][start.y] = "start";
-  instance.tiles[finish.x][finish.y] = "finish";
+  instance.tiles[start.x][start.y] = new Pipe("start");
+  instance.tiles[finish.x][finish.y] = new Pipe("finish");
+}
+
+function randomDirection() {
+  switch (rollRandom(0, 4)) {
+    case 0:
+      return "up";
+
+    case 1:
+      return "left";
+
+    case 2:
+      return "down";
+
+    case 3:
+      return "right";
+  }
 }
 
 function rollRandom(minimum, maximum) {

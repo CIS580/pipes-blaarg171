@@ -2,8 +2,16 @@
 
 module.exports = exports = Pipe;
 
+//This should be an inheritable class...
 function Pipe(type) {
   this.type = type;
-  this.spritesheet = new Image();
-  this.spritesheet.src = encodeURI('assets/pipes.png');
+  this.percentFilled = 0;
+}
+
+Pipe.prototype.update = function () {
+
+}
+
+Pipe.prototype.render = function (ctx) {
+
 }
