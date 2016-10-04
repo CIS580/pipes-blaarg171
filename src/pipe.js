@@ -6,7 +6,7 @@ module.exports = exports = Pipe;
 function Pipe(type) {
   this.type = type;
   this.fillLevel = 0;
-  this.maximum = 32;
+  this.maximum = (type == "start" || type == "finish") ? 16 : 32;
   this.direction = "";
   this.connections = setConnections(this.type);
 }
@@ -42,6 +42,14 @@ Pipe.prototype.update = function () {
 function setConnections(type) {
   var connections;
   switch (type) {
+    case "start":
+      connections = [false, false, true, false];
+      break;
+
+    case "finish":
+      connections = [true, false, false, false];
+      break;
+
     case "cross":
       connections = [true, true, true, true];
       break;
@@ -92,6 +100,20 @@ function setConnections(type) {
 Pipe.prototype.stupidWaterRenderingCrapThatImTiredOfDealingWith = function () {
   var rect = new Object();
   switch (this.type) {
+    case "start":
+      rect.x = 14;
+      rect.y = 16;
+      rect.width = 2;
+      rect.height = this.fillLevel;
+      break;
+
+    case "finish":
+      rect.x = 14;
+      rect.y = 0;
+      rect.width = 2;
+      rect.height = this.fillLevel;
+      break;
+
     case "cross":
     case "vertical":
     case "horizontal":
@@ -127,7 +149,7 @@ Pipe.prototype.stupidWaterRenderingCrapThatImTiredOfDealingWith = function () {
       break;
 
     case "elbow_rd":
-      switch (instance.direction) {
+      switch (this.direction) {
         case "up":
           rect.x = 14;
           rect.y = 32;
@@ -145,7 +167,7 @@ Pipe.prototype.stupidWaterRenderingCrapThatImTiredOfDealingWith = function () {
       break;
 
     case "elbow_ru":
-      switch (instance.direction) {
+      switch (this.direction) {
         case "left":
           rect.x = 32;
           rect.y = 14;
@@ -163,7 +185,7 @@ Pipe.prototype.stupidWaterRenderingCrapThatImTiredOfDealingWith = function () {
       break;
 
     case "elbow_lu":
-      switch (instance.direction) {
+      switch (this.direction) {
         case "right":
           rect.x = 0;
           rect.y = 15;
@@ -181,7 +203,7 @@ Pipe.prototype.stupidWaterRenderingCrapThatImTiredOfDealingWith = function () {
       break;
 
     case "elbow_ld":
-      switch (instance.direction) {
+      switch (this.direction) {
         case "right":
           rect.x = 0;
           rect.y = 14;

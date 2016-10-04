@@ -29,7 +29,9 @@ var masterLoop = function (timestamp) {
  * the number of milliseconds passed since the last frame.
  */
 function update(elapsedTime) {
-  board.update(elapsedTime);
+  if (board.update(elapsedTime)) {
+    game.paused(true);
+  }
 }
 
 /**

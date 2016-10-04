@@ -3,7 +3,7 @@
 module.exports = exports = Board;
 
 const Pipe = require('./pipe');
-const MS_PER_FRAME = 1000 / 8;
+const MS_PER_FRAME = 1000 / 16;
 
 function Board(width, height, tileSize) {
   this.width = width / tileSize;
@@ -67,6 +67,7 @@ Board.prototype.update = function (time) {
         //lose game
       }
     }
+    if (this.current.type == "finish" && this.current.fillLevel >= this.current.maximum) return true;
   }
 }
 
@@ -79,8 +80,10 @@ Board.prototype.render = function (ctx) {
 
       if (this.tiles[x][y].fillLevel > 0) {
         var rect = this.tiles[x][y].stupidWaterRenderingCrapThatImTiredOfDealingWith();
+        var scale = this.tileSize / this.spriteSize;
         ctx.fillStyle = "#00FFFF";
-        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+        ctx.fillRect(x * this.tileSize + rect.x * scale, y * this.tileSize + rect.y * scale,
+          rect.width * scale, rect.height * scale);
       }
 
       switch (this.tiles[x][y].type) {
@@ -277,8 +280,10 @@ function setStartFinish(instance) {
     finish.y = rollRandom(1, 7);
   } while (start == finish);
 
-  start.direction = randomDirection();
-  finish.direction = randomDirection();
+  // start.direction = randomDirection();
+  // finish.direction = randomDirection();
+  start.direction = "down";
+  finish.direction = "down";
 
   instance.start = start;
   instance.finish = finish;
