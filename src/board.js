@@ -13,7 +13,7 @@ function Board(width, height, tileSize) {
   this.spritesheet.src = encodeURI('assets/pipes.png');
   this.spriteSize = 32;
   this.timer = 0;
-  this.pipeSet = { index: 0, num: [8, 12] };
+  this.pipeSet = { index: 0, num: [7, 11] };
   this.nextPipe = newNextPipe(this.pipeSet.num[this.pipeSet.index]);
 
   this.tiles = new Array(this.width);
@@ -63,7 +63,7 @@ Board.prototype.update = function (time) {
         this.current = { x: next.x, y: next.y, direction: this.current.direction };
         this.tiles[next.x][next.y].direction = this.current.direction;
       }
-      else{
+      else {
         //lose game
       }
     }
@@ -78,7 +78,9 @@ Board.prototype.render = function (ctx) {
       if (this.tiles[x][y] == "empty") continue;
 
       if (this.tiles[x][y].fillLevel > 0) {
-        ctx.fillRect((x * this.tileSize) + this.tileSize / 2, (y * this.tileSize) + this.tileSize / 2, 2, 2);
+        var rect = this.tiles[x][y].stupidWaterRenderingCrapThatImTiredOfDealingWith();
+        ctx.fillStyle = "#00FFFF";
+        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
       }
 
       switch (this.tiles[x][y].type) {
