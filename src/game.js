@@ -28,8 +28,6 @@ function Game(screen, updateFunction, renderFunction) {
   this.gameOver = true;
   this.initialized = false;
 
-  this.level = 1;
-
   // Start the game loop
   this.oldTime = performance.now();
 }

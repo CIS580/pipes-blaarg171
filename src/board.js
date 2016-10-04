@@ -3,7 +3,6 @@
 module.exports = exports = Board;
 
 const Pipe = require('./pipe');
-const MS_PER_FRAME = 1000 / 16;
 
 function Board(width, height, tileSize) {
   this.width = width / tileSize;
@@ -12,7 +11,6 @@ function Board(width, height, tileSize) {
   this.spritesheet = new Image();
   this.spritesheet.src = encodeURI('assets/pipes.png');
   this.spriteSize = 32;
-  this.timer = 0;
   this.pipeSet = { index: 0, num: [7, 11] };
   this.nextPipe = newNextPipe(this.pipeSet.num[this.pipeSet.index]);
 
@@ -30,51 +28,55 @@ function Board(width, height, tileSize) {
   this.current = { x: this.start.x, y: this.start.y, direction: this.start.direction };
 }
 
-Board.prototype.update = function (time) {
-  this.timer += time;
-  if (this.timer >= MS_PER_FRAME) {
-    this.timer = 0;
-    if (this.tiles[this.current.x][this.current.y].update()) {
-      var next = this.current;
-      var connectDir;
-      switch (this.current.direction) {
-        case "up":
-          next.y -= 1;
-          connectDir = 2;
-          break;
+Board.prototype.update = function () {
+  var currPipe = this.tiles[this.current.x][this.current.y];
+  if (currPipe.update()) {
+    if (currPipe.type == "finish") return "win"
+    var nextTile = this.current;
+    var nextPipe;
+    var connectDir;
+    switch (currPipe.direction) {
+      case "up":
+        nextTile.y -= 1;
+        connectDir = 2;
+        break;
 
-        case "left":
-          next.x -= 1;
-          connectDir = 3
-          break;
+      case "left":
+        nextTile.x -= 1;
+        connectDir = 3
+        break;
 
-        case "down":
-          next.y += 1;
-          connectDir = 0;
-          break;
+      case "down":
+        nextTile.y += 1;
+        connectDir = 0;
+        break;
 
-        case "right":
-          next.x += 1;
-          connectDir = 1;
-          break;
-      }
-      next = this.tiles[next.x][next.y];
-      if (next.connections[connectDir]) {
-        this.current = { x: next.x, y: next.y, direction: this.current.direction };
-        this.tiles[next.x][next.y].direction = this.current.direction;
-      }
-      else {
-        //lose game
-      }
+      case "right":
+        nextTile.x += 1;
+        connectDir = 1;
+        break;
     }
-    if (this.current.type == "finish" && this.current.fillLevel >= this.current.maximum) return true;
-  }
+    nextPipe = this.tiles[nextTile.x][nextTile.y];
+    if (nextPipe.connections[connectDir]) {
+      this.current = { x: nextTile.x, y: nextTile.y, direction: currPipe.direction };
+      this.tiles[nextTile.x][nextTile.y].direction = this.current.direction;
+      return "score";
+    }
+    else {
+      // Lose game
+      return "lose";
+    }
+  };
 }
 
 Board.prototype.render = function (ctx) {
   for (var x = 0; x < this.width; x++) {
     for (var y = 0; y < this.height; y++) {
-      var srcx, srcy;
+      var next = getSprite(this.nextPipe, this.spriteSize);
+      ctx.drawImage(this.spritesheet,
+        next.x, next.y, this.spriteSize, this.spriteSize,
+        546, 380, this.tileSize, this.tileSize
+      );
 
       if (this.tiles[x][y] == "empty") continue;
 
@@ -86,75 +88,9 @@ Board.prototype.render = function (ctx) {
           rect.width * scale, rect.height * scale);
       }
 
-      switch (this.tiles[x][y].type) {
-        case "start":
-          srcx = 3 * this.spriteSize;
-          srcy = 3 * this.spriteSize;
-          break;
-
-        case "finish":
-          srcx = 3 * this.spriteSize;
-          srcy = 4 * this.spriteSize;
-          break;
-
-        case "cross":
-          srcx = 0 * this.spriteSize;
-          srcy = 0 * this.spriteSize;
-          break;
-
-        case "vertical":
-          srcx = 3 * this.spriteSize;
-          srcy = 2 * this.spriteSize;
-          break;
-
-        case "horizontal":
-          srcx = 3 * this.spriteSize;
-          srcy = 1 * this.spriteSize;
-          break;
-
-        case "elbow_rd":
-          srcx = 1 * this.spriteSize;
-          srcy = 1 * this.spriteSize;
-          break;
-
-        case "elbow_ru":
-          srcx = 1 * this.spriteSize;
-          srcy = 2 * this.spriteSize;
-          break;
-
-        case "elbow_lu":
-          srcx = 2 * this.spriteSize;
-          srcy = 2 * this.spriteSize;
-          break;
-
-        case "elbow_ld":
-          srcx = 2 * this.spriteSize;
-          srcy = 1 * this.spriteSize;
-          break;
-
-        case "t_d":
-          srcx = 1 * this.spriteSize;
-          srcy = 3 * this.spriteSize;
-          break;
-
-        case "t_r":
-          srcx = 1 * this.spriteSize;
-          srcy = 4 * this.spriteSize;
-          break;
-
-        case "t_u":
-          srcx = 2 * this.spriteSize;
-          srcy = 4 * this.spriteSize;
-          break;
-
-        case "t_l":
-          srcx = 2 * this.spriteSize;
-          srcy = 3 * this.spriteSize;
-          break;
-
-      }
+      var src = getSprite(this.tiles[x][y].type, this.spriteSize);
       ctx.drawImage(this.spritesheet,
-        srcx, srcy, this.spriteSize, this.spriteSize,
+        src.x, src.y, this.spriteSize, this.spriteSize,
         x * this.tileSize, y * this.tileSize, this.tileSize, this.tileSize
       );
     }
@@ -162,6 +98,7 @@ Board.prototype.render = function (ctx) {
 }
 
 Board.prototype.handleClick = function (position, click) {
+  if (position.x > 512) return;
   var clickPos = new Object();
   clickPos.x = Math.floor(position.x / this.tileSize);
   clickPos.y = Math.floor(position.y / this.tileSize);
@@ -269,6 +206,77 @@ function newNextPipe(max) {
   }
 }
 
+function getSprite(type, spriteSize) {
+  var src = new Object();
+  switch (type) {
+    case "start":
+      src.x = 3 * spriteSize;
+      src.y = 3 * spriteSize;
+      break;
+
+    case "finish":
+      src.x = 3 * spriteSize;
+      src.y = 4 * spriteSize;
+      break;
+
+    case "cross":
+      src.x = 0 * spriteSize;
+      src.y = 0 * spriteSize;
+      break;
+
+    case "vertical":
+      src.x = 3 * spriteSize;
+      src.y = 2 * spriteSize;
+      break;
+
+    case "horizontal":
+      src.x = 3 * spriteSize;
+      src.y = 1 * spriteSize;
+      break;
+
+    case "elbow_rd":
+      src.x = 1 * spriteSize;
+      src.y = 1 * spriteSize;
+      break;
+
+    case "elbow_ru":
+      src.x = 1 * spriteSize;
+      src.y = 2 * spriteSize;
+      break;
+
+    case "elbow_lu":
+      src.x = 2 * spriteSize;
+      src.y = 2 * spriteSize;
+      break;
+
+    case "elbow_ld":
+      src.x = 2 * spriteSize;
+      src.y = 1 * spriteSize;
+      break;
+
+    case "t_d":
+      src.x = 1 * spriteSize;
+      src.y = 3 * spriteSize;
+      break;
+
+    case "t_r":
+      src.x = 1 * spriteSize;
+      src.y = 4 * spriteSize;
+      break;
+
+    case "t_u":
+      src.x = 2 * spriteSize;
+      src.y = 4 * spriteSize;
+      break;
+
+    case "t_l":
+      src.x = 2 * spriteSize;
+      src.y = 3 * spriteSize;
+      break;
+  }
+  return src;
+}
+
 function setStartFinish(instance) {
   var start = new Object();
   var finish = new Object();
@@ -288,8 +296,8 @@ function setStartFinish(instance) {
   instance.start = start;
   instance.finish = finish;
 
-  instance.tiles[start.x][start.y] = new Pipe("start");
-  instance.tiles[finish.x][finish.y] = new Pipe("finish");
+  instance.tiles[start.x][start.y] = new Pipe("start", start.direction);
+  instance.tiles[finish.x][finish.y] = new Pipe("finish", finish.direction);
 }
 
 function randomDirection() {

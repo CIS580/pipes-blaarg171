@@ -3,40 +3,40 @@
 module.exports = exports = Pipe;
 
 //This should be an inheritable class...
-function Pipe(type) {
+function Pipe(type, direction) {
   this.type = type;
   this.fillLevel = 0;
   this.maximum = (type == "start" || type == "finish") ? 16 : 32;
-  this.direction = "";
+  this.direction = direction;
   this.connections = setConnections(this.type);
 }
 
 Pipe.prototype.update = function () {
   this.fillLevel++;
-  // if (this.fillLevel == this.maximum / 2) {
-  //   switch (this.type) {
-  //     case "elbow_ld":
-  //       if (this.direction == "left") this.direction = "down";
-  //       else this.direction == "left";
-  //       break;
+  if (this.fillLevel == this.maximum / 2) {
+    switch (this.type) {
+      case "elbow_ru":
+        if (this.direction == "left") this.direction = "up";
+        else if (this.direction == "down") this.direction = "right";
+        break;
 
-  //     case "elbow_lu":
-  //       if (this.direction == "left") this.direction = "up";
-  //       else this.direction == "left";
-  //       break;
+      case "elbow_rd":
+        if (this.direction == "left") this.direction = "down";
+        else if (this.direction == "up") this.direction = "right";
+        break;
 
-  //     case "elbow_rd":
-  //       if (this.direction == "right") this.direction = "down";
-  //       else this.direction == "right";
-  //       break;
+      case "elbow_ld":
+        if (this.direction == "right") this.direction = "down";
+        else if (this.direction == "up") this.direction = "left";
+        break;
 
-  //     case "elbow_ru":
-  //       if (this.direction == "right") this.direction = "up";
-  //       else this.direction == "right";
-  //       break;
-  //   }
-  // }
-  if (this.fillLevel >= this.maximum) return true;
+      case "elbow_lu":
+        if (this.direction == "right") this.direction = "up";
+        else if (this.direction == "down") this.direction = "left";
+        break;
+    }
+  }
+  if (this.fillLevel >= this.maximum) return 1;
 }
 
 function setConnections(type) {
