@@ -3,10 +3,10 @@
 module.exports = exports = Pipe;
 
 //This should be an inheritable class...
-function Pipe(type, direction) {
+function Pipe(type, direction, max) {
   this.type = type;
   this.fillLevel = 0;
-  this.maximum = 16;
+  this.maximum = Math.max(max, 8);
   this.direction = direction;
   this.connections = setConnections(this.type);
 }
@@ -36,6 +36,7 @@ Pipe.prototype.update = function () {
         break;
     }
   }
+  console.log(this.fillLevel + " / " + this.maximum);
   if (this.fillLevel >= this.maximum) return 1;
 }
 
@@ -76,10 +77,10 @@ Pipe.prototype.stupidWaterRenderingCrapThatImTiredOfDealingWith = function (ctx,
 
         case "left":
           rects = [
-            { x: 5, y: 13, w: 5, h: 3 },
-            { x: 10, y: 13, w: 5, h: 3 },
+            { x: 20, y: 13, w: 5, h: 3 },
             { x: 15, y: 13, w: 5, h: 3 },
-            { x: 20, y: 13, w: 5, h: 3 }
+            { x: 10, y: 13, w: 5, h: 3 },
+            { x: 5, y: 13, w: 5, h: 3 }
           ];
           break;
 
@@ -94,10 +95,10 @@ Pipe.prototype.stupidWaterRenderingCrapThatImTiredOfDealingWith = function (ctx,
 
         case "right":
           rects = [
-            { x: 20, y: 13, w: 5, h: 3 },
-            { x: 15, y: 13, w: 5, h: 3 },
+            { x: 5, y: 13, w: 5, h: 3 },
             { x: 10, y: 13, w: 5, h: 3 },
-            { x: 5, y: 13, w: 5, h: 3 }
+            { x: 15, y: 13, w: 5, h: 3 },
+            { x: 20, y: 13, w: 5, h: 3 }
           ];
           break;
       }

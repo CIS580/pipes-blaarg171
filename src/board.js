@@ -4,10 +4,11 @@ module.exports = exports = Board;
 
 const Pipe = require('./pipe');
 
-function Board(width, height, tileSize) {
+function Board(width, height, tileSize, pipeMax) {
   this.width = width / tileSize;
   this.height = height / tileSize;
   this.tileSize = tileSize;
+  this.pipeMax = pipeMax;
   this.spritesheet = new Image();
   this.spritesheet.src = encodeURI('assets/pipes.png');
   this.spriteSize = 32;
@@ -59,7 +60,7 @@ Board.prototype.update = function () {
     }
     if (nextTile.x < 0 || nextTile.x > 7 || nextTile.y < 0 || nextTile.y > 7) return "lose";
     nextPipe = this.tiles[nextTile.x][nextTile.y];
-    if (nextPipe != undefined && nextPipe.connections[connectDir]) {
+    if ((nextPipe != undefined || nextPipe == "empty") && nextPipe.connections[connectDir]) {
       this.current = { x: nextTile.x, y: nextTile.y, direction: currPipe.direction };
       this.tiles[nextTile.x][nextTile.y].direction = this.current.direction;
       return "score";
@@ -106,39 +107,40 @@ Board.prototype.handleClick = function (position, click) {
   switch (click) {
     case "left":
       if (this.tiles[clickPos.x][clickPos.y] != "empty") return;
-      this.tiles[clickPos.x][clickPos.y] = new Pipe(this.nextPipe);
+      this.tiles[clickPos.x][clickPos.y] = new Pipe(this.nextPipe, "", this.pipeMax);
       this.nextPipe = newNextPipe(this.pipeSet.num[this.pipeSet.index]);
       break;
 
     case "right":
-      if (this.tiles[clickPos.x][clickPos.y].fillLevel != 0) return;
-      switch (this.tiles[clickPos.x][clickPos.y].type) {
+      var thisClickPipe = this.tiles[clickPos.x][clickPos.y];
+      if (thisClickPipe.fillLevel != 0) return;
+      switch (thisClickPipe.type) {
         case "vertical":
-          this.tiles[clickPos.x][clickPos.y] = new Pipe("horizontal");
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("horizontal", "", thisClickPipe.maximum);
           break;
 
         case "horizontal":
-          this.tiles[clickPos.x][clickPos.y] = new Pipe("vertical");
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("vertical", "", thisClickPipe.maximum);
           break;
 
 
         case "elbow_rd":
-          this.tiles[clickPos.x][clickPos.y] = new Pipe("elbow_ld");
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("elbow_ld", "", thisClickPipe.maximum);
           break;
 
 
         case "elbow_ru":
-          this.tiles[clickPos.x][clickPos.y] = new Pipe("elbow_rd");
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("elbow_rd", "", thisClickPipe.maximum);
           break;
 
 
         case "elbow_lu":
-          this.tiles[clickPos.x][clickPos.y] = new Pipe("elbow_ru");
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("elbow_ru", "", thisClickPipe.maximum);
           break;
 
 
         case "elbow_ld":
-          this.tiles[clickPos.x][clickPos.y] = new Pipe("elbow_lu");
+          this.tiles[clickPos.x][clickPos.y] = new Pipe("elbow_lu", "", thisClickPipe.maximum);
           break;
 
 
@@ -286,7 +288,7 @@ function setStartFinish(instance) {
     start.y = rollRandom(1, 7);
     finish.x = rollRandom(1, 7);
     finish.y = rollRandom(1, 7);
-  } while (start == finish);
+  } while (start.x == finish.x && start.y == finish.y);
 
   // start.direction = randomDirection();
   // finish.direction = randomDirection();
@@ -296,8 +298,8 @@ function setStartFinish(instance) {
   instance.start = start;
   instance.finish = finish;
 
-  instance.tiles[start.x][start.y] = new Pipe("start", start.direction);
-  instance.tiles[finish.x][finish.y] = new Pipe("finish", finish.direction);
+  instance.tiles[start.x][start.y] = new Pipe("start", start.direction, instance.pipeMax);
+  instance.tiles[finish.x][finish.y] = new Pipe("finish", finish.direction, instance.pipeMax);
 }
 
 function randomDirection() {

@@ -10,13 +10,14 @@ const MS_PER_FRAME = 1000 / 16;
 /* Global variables */
 var canvas = document.getElementById('screen');
 var game = new Game(canvas, update, render);
-var board = new Board(512, 512, 64);
+var board = new Board(512, 512, 64, 32);
 // var ui = new UI({ x: 514, y: 0, width: 128, height: 512 }, { timer: });
 var mainTimer = 0;
 var mainState = "initializing";
 var prepTimer = 0;
 var data = {
   timer: 30,
+  timerBase: 30,
   score: 0,
   level: 1
 };
@@ -62,15 +63,21 @@ function update(elapsedTime) {
         switch (asdf) {
           case "lose":
             game.pause(true);
+            console.log("lose");
             break;
 
           case "score":
             data.score++;
+            console.log("score");
             break;
 
           case "win":
             data.score += data.timer;
-            game.pause(true);
+            console.log("win");
+            data.level++;
+            board = new Board(512, 512, 64, (data.level >= 10) ? board.pipeMax / 2 : 32);
+            mainState = "initializing";
+            data.timer = Math.max(data.timerBase - ((data.level - 1) * 5), 5);
             break;
         }
       }
@@ -141,9 +148,11 @@ canvas.onclick = function (event) {
   clickPos.y = Math.floor((event.clientY - clientRect.top) / (clientRect.bottom - clientRect.top) * canvas.height);
 
   board.handleClick(clickPos, "left");
+  if (mainState == "initializing") mainState = "prep";
 }
 
 canvas.oncontextmenu = function (event) {
+  if (game.paused || game.gameOver || game.initialized) return;
   event.preventDefault();
   var clickPos = new Object();
   var clientRect = canvas.getBoundingClientRect();
@@ -151,6 +160,7 @@ canvas.oncontextmenu = function (event) {
   clickPos.y = Math.floor((event.clientY - clientRect.top) / (clientRect.bottom - clientRect.top) * canvas.height);
 
   board.handleClick(clickPos, "right");
+  if (mainState == "initializing") mainState = "prep";
 }
 
 game.initialize();
