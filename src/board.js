@@ -106,7 +106,10 @@ Board.prototype.handleClick = function (position, click, ctrl) {
 
   switch (click) {
     case "left":
-      if (!ctrl && this.tiles[clickPos.x][clickPos.y] != "empty") return;
+      var thisClickPipe = this.tiles[clickPos.x][clickPos.y];
+      if (!ctrl && thisClickPipe != "empty") return;
+      if (thisClickPipe.type == "start" || thisClickPipe.type == "finish" ||
+        thisClickPipe.fillLevel > 0) return;
       this.tiles[clickPos.x][clickPos.y] = new Pipe(this.nextPipe, "", this.pipeMax);
       this.nextPipe = newNextPipe(this.pipeSet.num[this.pipeSet.index]);
       break;

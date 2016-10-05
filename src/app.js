@@ -141,8 +141,8 @@ window.onkeydown = function (event) {
 }
 
 canvas.onclick = function (event) {
-  if (game.paused || game.gameOver || game.initialized) return;
   event.preventDefault();
+  if (game.paused || game.gameOver || game.initialized) return;
   var clickPos = new Object();
   var clientRect = canvas.getBoundingClientRect();
   clickPos.x = Math.floor((event.clientX - clientRect.left) / (clientRect.right - clientRect.left) * canvas.width);
@@ -153,8 +153,8 @@ canvas.onclick = function (event) {
 }
 
 canvas.oncontextmenu = function (event) {
-  if (game.paused || game.gameOver || game.initialized) return;
   event.preventDefault();
+  if (game.paused || game.gameOver || game.initialized) return;
   var clickPos = new Object();
   var clientRect = canvas.getBoundingClientRect();
   clickPos.x = Math.floor((event.clientX - clientRect.left) / (clientRect.right - clientRect.left) * canvas.width);
