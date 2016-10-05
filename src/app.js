@@ -16,8 +16,8 @@ var mainTimer = 0;
 var mainState = "initializing";
 var prepTimer = 0;
 var data = {
-  timer: 30,
-  timerBase: 30,
+  timer: 15,
+  timerBase: 15,
   score: 0,
   level: 1
 };
@@ -68,16 +68,18 @@ function update(elapsedTime) {
 
           case "score":
             data.score++;
-            console.log("score");
+            // data.score += Math.max(1, data.timer * 1);
+            // console.log("score");
             break;
 
           case "win":
             data.score += data.timer;
-            console.log("win");
+            // console.log("win");
             data.level++;
-            board = new Board(512, 512, 64, (data.level >= 10) ? board.pipeMax / 2 : 32);
+            board = new Board(512, 512, 64, (data.level >= 5) ? ((data.level >= 10) ? 8 : 16) : 32);
             mainState = "initializing";
-            data.timer = Math.max(data.timerBase - ((data.level - 1) * 5), 5);
+            // data.timer = Math.max(data.timerBase - ((data.level - 1) * 5), 5);
+            data.timer = data.timerBase;
             break;
         }
       }
@@ -102,7 +104,6 @@ function render(elapsedTime, ctx) {
   ctx.fillRect(514, 0, 128, 512);
 
   // UI
-  // UI.render(ctx);
   ctx.fillStyle = "black"
   ctx.font = "20px Verdana";
   ctx.fillText("Level:", 578, 20);
@@ -147,7 +148,7 @@ canvas.onclick = function (event) {
   clickPos.x = Math.floor((event.clientX - clientRect.left) / (clientRect.right - clientRect.left) * canvas.width);
   clickPos.y = Math.floor((event.clientY - clientRect.top) / (clientRect.bottom - clientRect.top) * canvas.height);
 
-  board.handleClick(clickPos, "left");
+  board.handleClick(clickPos, "left", event.ctrlKey);
   if (mainState == "initializing") mainState = "prep";
 }
 

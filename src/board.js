@@ -60,7 +60,7 @@ Board.prototype.update = function () {
     }
     if (nextTile.x < 0 || nextTile.x > 7 || nextTile.y < 0 || nextTile.y > 7) return "lose";
     nextPipe = this.tiles[nextTile.x][nextTile.y];
-    if ((nextPipe != undefined || nextPipe == "empty") && nextPipe.connections[connectDir]) {
+    if (nextPipe != undefined && nextPipe != "empty" && nextPipe.connections[connectDir]) {
       this.current = { x: nextTile.x, y: nextTile.y, direction: currPipe.direction };
       this.tiles[nextTile.x][nextTile.y].direction = this.current.direction;
       return "score";
@@ -98,7 +98,7 @@ Board.prototype.render = function (ctx) {
   }
 }
 
-Board.prototype.handleClick = function (position, click) {
+Board.prototype.handleClick = function (position, click, ctrl) {
   if (position.x > 512) return;
   var clickPos = new Object();
   clickPos.x = Math.floor(position.x / this.tileSize);
@@ -106,7 +106,7 @@ Board.prototype.handleClick = function (position, click) {
 
   switch (click) {
     case "left":
-      if (this.tiles[clickPos.x][clickPos.y] != "empty") return;
+      if (!ctrl && this.tiles[clickPos.x][clickPos.y] != "empty") return;
       this.tiles[clickPos.x][clickPos.y] = new Pipe(this.nextPipe, "", this.pipeMax);
       this.nextPipe = newNextPipe(this.pipeSet.num[this.pipeSet.index]);
       break;

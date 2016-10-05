@@ -47,9 +47,10 @@ Game.prototype.pause = function (flag) {
  * @param{time} the current time as a DOMHighResTimeStamp
  */
 Game.prototype.loop = function (newTime) {
-  var game = this;
   var elapsedTime = newTime - this.oldTime;
   this.oldTime = newTime;
+
+  if (elapsedTime >= 1000) elapsedTime = 500;
 
   if (!this.paused) this.update(elapsedTime);
   this.render(elapsedTime, this.frontCtx);

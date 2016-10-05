@@ -6,7 +6,7 @@ module.exports = exports = Pipe;
 function Pipe(type, direction, max) {
   this.type = type;
   this.fillLevel = 0;
-  this.maximum = Math.max(max, 8);
+  this.maximum = max;
   this.direction = direction;
   this.connections = setConnections(this.type);
 }
