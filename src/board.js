@@ -3,8 +3,10 @@
 module.exports = exports = Board;
 
 const Pipe = require('./pipe');
+const SFX = require('./sfx');
 
 function Board(width, height, tileSize, pipeMax) {
+  this.sfx = new SFX();
   this.width = width / tileSize;
   this.height = height / tileSize;
   this.tileSize = tileSize;
@@ -32,8 +34,10 @@ function Board(width, height, tileSize, pipeMax) {
 Board.prototype.update = function () {
   var currPipe = this.tiles[this.current.x][this.current.y];
   if (currPipe.update()) {
-    if (currPipe.type == "finish")
+    if (currPipe.type == "finish") {
+      this.sfx.play("levelUp");
       return "win"
+    }
     var nextTile = this.current;
     var nextPipe;
     var connectDir;
@@ -67,6 +71,7 @@ Board.prototype.update = function () {
     }
     else {
       // Lose game
+      this.sfx.play("gameOver");
       return "lose";
     }
   };
@@ -112,6 +117,7 @@ Board.prototype.handleClick = function (position, click, ctrl) {
         thisClickPipe.fillLevel > 0) return;
       this.tiles[clickPos.x][clickPos.y] = new Pipe(this.nextPipe, "", this.pipeMax);
       this.nextPipe = newNextPipe(this.pipeSet.num[this.pipeSet.index]);
+      this.sfx.play("place");
       break;
 
     case "right":
@@ -169,6 +175,7 @@ Board.prototype.handleClick = function (position, click, ctrl) {
         default:
           return;
       }
+      this.sfx.play("rotate");
       break;
   }
 }

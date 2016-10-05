@@ -16,9 +16,10 @@ var mainTimer = 0;
 var mainState = "initializing";
 var prepTimer = 0;
 var data = {
-  timer: 15,
+  timer: 30,
   timerBase: 15,
   score: 0,
+  // hiScore: 0,
   level: 1
 };
 
@@ -49,6 +50,7 @@ function update(elapsedTime) {
         prepTimer -= 1000;
         data.timer--;
         if (data.timer <= 0) {
+          board.sfx.play("stream");
           mainState = "running";
           data.timer = 0;
         }
@@ -69,17 +71,16 @@ function update(elapsedTime) {
           case "score":
             data.score++;
             // data.score += Math.max(1, data.timer * 1);
-            // console.log("score");
             break;
 
           case "win":
-            data.score += data.timer;
-            // console.log("win");
+            data.score += data.timer + data.level;
             data.level++;
-            board = new Board(512, 512, 64, (data.level >= 5) ? ((data.level >= 10) ? 8 : 16) : 32);
+            board = new Board(512, 512, 64, (data.level > 5) ? ((data.level > 10) ? 8 : 16) : 32);
             mainState = "initializing";
             // data.timer = Math.max(data.timerBase - ((data.level - 1) * 5), 5);
-            data.timer = data.timerBase;
+            data.timer = (data.level > 5) ? (data.level > 15) ? Math.max(5, data.timerBase - (data.level - 15) * 5) : data.timerBase : data.timerBase * 2;
+            // data.timer = data.timerBase;
             break;
         }
       }
@@ -110,6 +111,8 @@ function render(elapsedTime, ctx) {
   ctx.fillText(data.level, 578, 40);
   ctx.fillText("Score:", 578, 80);
   ctx.fillText(data.score, 578, 100);
+  // ctx.fillText("High Score:", 578, 140);
+  // ctx.fillText(data.hiScore, 578, 160);
   ctx.fillText("Timer:", 578, 140);
   ctx.fillText(data.timer, 578, 160);
   ctx.fillText("Next Pipe:", 578, 360);
@@ -129,6 +132,7 @@ window.onkeydown = function (event) {
       event.preventDefault();
       switch (mainState) {
         case "prep":
+          board.sfx.play("stream");
           mainState = "running";
           break;
 
