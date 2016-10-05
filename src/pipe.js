@@ -6,7 +6,7 @@ module.exports = exports = Pipe;
 function Pipe(type, direction) {
   this.type = type;
   this.fillLevel = 0;
-  this.maximum = (type == "start" || type == "finish") ? 16 : 32;
+  this.maximum = 16;
   this.direction = direction;
   this.connections = setConnections(this.type);
 }
@@ -37,6 +37,190 @@ Pipe.prototype.update = function () {
     }
   }
   if (this.fillLevel >= this.maximum) return 1;
+}
+
+Pipe.prototype.stupidWaterRenderingCrapThatImTiredOfDealingWith = function (ctx, x, y, scale) {
+  var index = Math.floor(this.fillLevel / (this.maximum / 4));
+  var rects;
+  switch (this.type) {
+    case "start":
+      rects = [
+        { x: 14, y: 15, w: 2, h: 3 },
+        { x: 14, y: 18, w: 2, h: 3 },
+        { x: 14, y: 21, w: 2, h: 3 },
+        { x: 14, y: 24, w: 2, h: 3 }
+      ];
+      break;
+
+    case "finish":
+      rects = [
+        { x: 14, y: 5, w: 2, h: 3 },
+        { x: 14, y: 8, w: 2, h: 3 },
+        { x: 14, y: 11, w: 2, h: 3 },
+        { x: 14, y: 14, w: 2, h: 3 }
+      ];
+      break;
+
+    case "cross":
+    case "vertical":
+    case "horizontal":
+      switch (this.direction) {
+        case "up":
+          rects = [
+            { x: 14, y: 22, w: 2, h: 5 },
+            { x: 14, y: 17, w: 2, h: 5 },
+            { x: 14, y: 12, w: 2, h: 5 },
+            { x: 14, y: 7, w: 2, h: 5 }
+          ];
+          break;
+
+        case "left":
+          rects = [
+            { x: 5, y: 13, w: 5, h: 3 },
+            { x: 10, y: 13, w: 5, h: 3 },
+            { x: 15, y: 13, w: 5, h: 3 },
+            { x: 20, y: 13, w: 5, h: 3 }
+          ];
+          break;
+
+        case "down":
+          rects = [
+            { x: 14, y: 7, w: 2, h: 5 },
+            { x: 14, y: 12, w: 2, h: 5 },
+            { x: 14, y: 17, w: 2, h: 5 },
+            { x: 14, y: 22, w: 2, h: 5 }
+          ];
+          break;
+
+        case "right":
+          rects = [
+            { x: 20, y: 13, w: 5, h: 3 },
+            { x: 15, y: 13, w: 5, h: 3 },
+            { x: 10, y: 13, w: 5, h: 3 },
+            { x: 5, y: 13, w: 5, h: 3 }
+          ];
+          break;
+      }
+      break;
+
+    case "elbow_rd":
+      switch (this.direction) {
+        case "up":
+        case "right":
+          rects = [
+            { x: 14, y: 22, w: 3, h: 4 },
+            { x: 14, y: 17, w: 3, h: 5 },
+            { x: 17, y: 14, w: 5, h: 3 },
+            { x: 22, y: 14, w: 4, h: 3 }
+          ];
+          break;
+
+        case "left":
+        case "down":
+          rects = [
+            { x: 22, y: 14, w: 4, h: 3 },
+            { x: 17, y: 14, w: 5, h: 3 },
+            { x: 14, y: 17, w: 3, h: 5 },
+            { x: 14, y: 22, w: 3, h: 4 }
+          ];
+          break;
+      }
+      break;
+
+    case "elbow_ru":
+      switch (this.direction) {
+        case "left":
+        case "up":
+          rects = [
+            { x: 22, y: 13, w: 3, h: 2 },
+            { x: 18, y: 13, w: 4, h: 2 },
+            { x: 16, y: 12, w: 2, h: 2 },
+            { x: 14, y: 7, w: 2, h: 4 }
+          ];
+          break;
+
+        case "down":
+        case "right":
+          rects = [
+            { x: 14, y: 7, w: 2, h: 4 },
+            { x: 16, y: 12, w: 2, h: 2 },
+            { x: 18, y: 13, w: 4, h: 2 },
+            { x: 22, y: 13, w: 3, h: 2 }
+          ];
+          break;
+      }
+      break;
+
+    case "elbow_lu":
+      switch (this.direction) {
+        case "right":
+        case "up":
+          rects = [
+            { x: 5, y: 14, w: 4, h: 2 },
+            { x: 9, y: 13, w: 4, h: 3 },
+            { x: 13, y: 10, w: 2, h: 2 },
+            { x: 15, y: 7, w: 2, h: 3 }
+          ];
+          break;
+
+        case "down":
+        case "left":
+          rects = [
+            { x: 15, y: 7, w: 2, h: 3 },
+            { x: 13, y: 10, w: 2, h: 2 },
+            { x: 9, y: 13, w: 4, h: 3 },
+            { x: 5, y: 14, w: 4, h: 2 }
+          ];
+          break;
+      }
+      break;
+
+    case "elbow_ld":
+      switch (this.direction) {
+        case "right":
+        case "down":
+          rects = [
+            { x: 4, y: 13, w: 6, h: 2 },
+            { x: 11, y: 15, w: 2, h: 2 },
+            { x: 13, y: 20, w: 2, h: 2 },
+            { x: 14, y: 23, w: 2, h: 6 }
+          ];
+          break;
+
+        case "up":
+        case "left":
+          rects = [
+            { x: 14, y: 23, w: 2, h: 6 },
+            { x: 13, y: 20, w: 2, h: 2 },
+            { x: 11, y: 15, w: 2, h: 2 },
+            { x: 4, y: 13, w: 6, h: 2 }
+          ];
+          break;
+      }
+      break;
+
+    case "t_d":
+
+      break;
+
+    case "t_r":
+
+      break;
+
+    case "t_u":
+
+      break;
+
+    case "t_l":
+
+      break;
+  }
+
+  ctx.fillStyle = "#00FFFF";
+  for (var i = 0; i < index; i++) {
+    ctx.fillRect(x + rects[i].x * scale, y + rects[i].y * scale,
+      rects[i].w * scale, rects[i].h * scale);
+  }
 }
 
 function setConnections(type) {
@@ -97,144 +281,3 @@ function setConnections(type) {
   return connections;
 }
 
-Pipe.prototype.stupidWaterRenderingCrapThatImTiredOfDealingWith = function () {
-  var rect = new Object();
-  switch (this.type) {
-    case "start":
-      rect.x = 14;
-      rect.y = 16;
-      rect.width = 2;
-      rect.height = this.fillLevel;
-      break;
-
-    case "finish":
-      rect.x = 14;
-      rect.y = 0;
-      rect.width = 2;
-      rect.height = this.fillLevel;
-      break;
-
-    case "cross":
-    case "vertical":
-    case "horizontal":
-      switch (this.direction) {
-        case "up":
-          rect.x = 14;
-          rect.y = 32;
-          rect.width = 2;
-          rect.height = this.fillLevel;
-          break;
-
-        case "left":
-          rect.x = 32;
-          rect.y = 13;
-          rect.width = this.fillLevel;
-          rect.height = 3;
-          break;
-
-        case "down":
-          rect.x = 14;
-          rect.y = 0;
-          rect.width = 2;
-          rect.height = this.fillLevel;
-          break;
-
-        case "right":
-          rect.x = 0;
-          rect.y = 13;
-          rect.width = this.fillLevel;
-          rect.height = 3;
-          break;
-      }
-      break;
-
-    case "elbow_rd":
-      switch (this.direction) {
-        case "up":
-          rect.x = 14;
-          rect.y = 32;
-          rect.width = Math.max(2, this.fillLevel - this.fillLevel / 2);
-          rect.height = Math.min(18, this.fillLevel);
-          break;
-
-        case "left":
-          rect.x = 32;
-          rect.y = 14;
-          rect.width = Math.min(18, this.fillLevel);
-          rect.height = Math.max(2, this.fillLevel - this.fillLevel / 2);
-          break;
-      }
-      break;
-
-    case "elbow_ru":
-      switch (this.direction) {
-        case "left":
-          rect.x = 32;
-          rect.y = 14;
-          rect.width = Math.min(18, this.fillLevel);
-          rect.height = Math.max(2, this.fillLevel - this.fillLevel / 2);
-          break;
-
-        case "down":
-          rect.x = 14;
-          rect.y = 0;
-          rect.width = Math.max(2, this.fillLevel - this.fillLevel / 2);
-          rect.height = Math.min(18, this.fillLevel);
-          break;
-      }
-      break;
-
-    case "elbow_lu":
-      switch (this.direction) {
-        case "right":
-          rect.x = 0;
-          rect.y = 15;
-          rect.width = Math.min(18, this.fillLevel);
-          rect.height = Math.max(2, this.fillLevel - this.fillLevel / 2);
-          break;
-
-        case "down":
-          rect.x = 16;
-          rect.y = 0;
-          rect.width = Math.max(2, this.fillLevel - this.fillLevel / 2);
-          rect.height = Math.min(18, this.fillLevel);
-          break;
-      }
-      break;
-
-    case "elbow_ld":
-      switch (this.direction) {
-        case "right":
-          rect.x = 0;
-          rect.y = 14;
-          rect.width = Math.min(18, this.fillLevel);
-          rect.height = Math.max(2, this.fillLevel - this.fillLevel / 2);
-          break;
-
-        case "up":
-          rect.x = 14;
-          rect.y = 32;
-          rect.width = Math.max(2, this.fillLevel - this.fillLevel / 2);
-          rect.height = Math.min(18, this.fillLevel);
-          break;
-      }
-      break;
-
-    case "t_d":
-
-      break;
-
-    case "t_r":
-
-      break;
-
-    case "t_u":
-
-      break;
-
-    case "t_l":
-
-      break;
-  }
-  return rect;
-}

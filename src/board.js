@@ -31,7 +31,8 @@ function Board(width, height, tileSize) {
 Board.prototype.update = function () {
   var currPipe = this.tiles[this.current.x][this.current.y];
   if (currPipe.update()) {
-    if (currPipe.type == "finish") return "win"
+    if (currPipe.type == "finish")
+      return "win"
     var nextTile = this.current;
     var nextPipe;
     var connectDir;
@@ -56,8 +57,9 @@ Board.prototype.update = function () {
         connectDir = 1;
         break;
     }
+    if (nextTile.x < 0 || nextTile.x > 7 || nextTile.y < 0 || nextTile.y > 7) return "lose";
     nextPipe = this.tiles[nextTile.x][nextTile.y];
-    if (nextPipe.connections[connectDir]) {
+    if (nextPipe != undefined && nextPipe.connections[connectDir]) {
       this.current = { x: nextTile.x, y: nextTile.y, direction: currPipe.direction };
       this.tiles[nextTile.x][nextTile.y].direction = this.current.direction;
       return "score";
@@ -81,11 +83,9 @@ Board.prototype.render = function (ctx) {
       if (this.tiles[x][y] == "empty") continue;
 
       if (this.tiles[x][y].fillLevel > 0) {
-        var rect = this.tiles[x][y].stupidWaterRenderingCrapThatImTiredOfDealingWith();
         var scale = this.tileSize / this.spriteSize;
-        ctx.fillStyle = "#00FFFF";
-        ctx.fillRect(x * this.tileSize + rect.x * scale, y * this.tileSize + rect.y * scale,
-          rect.width * scale, rect.height * scale);
+        this.tiles[x][y].stupidWaterRenderingCrapThatImTiredOfDealingWith(ctx,
+          x * this.tileSize, y * this.tileSize, scale);
       }
 
       var src = getSprite(this.tiles[x][y].type, this.spriteSize);

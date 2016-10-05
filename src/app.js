@@ -5,7 +5,7 @@ const Game = require('./game');
 const Board = require('./board');
 // const UI = require('./ui');
 
-const MS_PER_FRAME = 1000 / 8;
+const MS_PER_FRAME = 1000 / 16;
 
 /* Global variables */
 var canvas = document.getElementById('screen');
@@ -70,6 +70,7 @@ function update(elapsedTime) {
 
           case "win":
             data.score += data.timer;
+            game.pause(true);
             break;
         }
       }
