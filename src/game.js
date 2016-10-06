@@ -79,3 +79,9 @@ Game.prototype.start = function (loop) {
   window.requestAnimationFrame(loop);
 }
 
+Game.prototype.end = function () {
+  this.frontCtx.fillStyle = "black";
+  this.frontCtx.font = "bold 60px Verdana";
+  this.frontCtx.fillText("GAME OVER", 256, 256);
+}
+

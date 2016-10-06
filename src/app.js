@@ -3,7 +3,7 @@
 /* Classes */
 const Game = require('./game');
 const Board = require('./board');
-// const UI = require('./ui');
+const SFX = require('./sfx');
 
 const MS_PER_FRAME = 1000 / 16;
 
@@ -11,7 +11,7 @@ const MS_PER_FRAME = 1000 / 16;
 var canvas = document.getElementById('screen');
 var game = new Game(canvas, update, render);
 var board = new Board(512, 512, 64, 32);
-// var ui = new UI({ x: 514, y: 0, width: 128, height: 512 }, { timer: });
+var sfx = new SFX();
 var mainTimer = 0;
 var mainState = "initializing";
 var prepTimer = 0;
@@ -29,6 +29,7 @@ var data = {
  * @param {DOMHighResTimeStamp} timestamp the current time
  */
 var masterLoop = function (timestamp) {
+  if (game.gameOver) { game.end(); return; }
   game.loop(timestamp);
   window.requestAnimationFrame(masterLoop);
 }
@@ -50,7 +51,7 @@ function update(elapsedTime) {
         prepTimer -= 1000;
         data.timer--;
         if (data.timer <= 0) {
-          board.sfx.play("stream");
+          sfx.play("stream");
           mainState = "running";
           data.timer = 0;
         }
@@ -64,8 +65,9 @@ function update(elapsedTime) {
         var asdf = board.update();
         switch (asdf) {
           case "lose":
+            sfx.play("gameOver");
             game.pause(true);
-            console.log("lose");
+            game.gameOver = true;
             break;
 
           case "score":
@@ -74,6 +76,7 @@ function update(elapsedTime) {
             break;
 
           case "win":
+            sfx.play("levelUp");
             data.score += data.timer + data.level;
             data.level++;
             board = new Board(512, 512, 64, (data.level > 5) ? ((data.level > 10) ? 8 : 16) : 32);
@@ -111,8 +114,6 @@ function render(elapsedTime, ctx) {
   ctx.fillText(data.level, 578, 40);
   ctx.fillText("Score:", 578, 80);
   ctx.fillText(data.score, 578, 100);
-  // ctx.fillText("High Score:", 578, 140);
-  // ctx.fillText(data.hiScore, 578, 160);
   ctx.fillText("Timer:", 578, 140);
   ctx.fillText(data.timer, 578, 160);
   ctx.fillText("Next Pipe:", 578, 360);
@@ -132,7 +133,7 @@ window.onkeydown = function (event) {
       event.preventDefault();
       switch (mainState) {
         case "prep":
-          board.sfx.play("stream");
+          sfx.play("stream");
           mainState = "running";
           break;
 
@@ -152,7 +153,7 @@ canvas.onclick = function (event) {
   clickPos.x = Math.floor((event.clientX - clientRect.left) / (clientRect.right - clientRect.left) * canvas.width);
   clickPos.y = Math.floor((event.clientY - clientRect.top) / (clientRect.bottom - clientRect.top) * canvas.height);
 
-  board.handleClick(clickPos, "left", event.ctrlKey);
+  if (board.handleClick(clickPos, "left", event.ctrlKey)) sfx.play("place");
   if (mainState == "initializing") mainState = "prep";
 }
 
@@ -164,7 +165,7 @@ canvas.oncontextmenu = function (event) {
   clickPos.x = Math.floor((event.clientX - clientRect.left) / (clientRect.right - clientRect.left) * canvas.width);
   clickPos.y = Math.floor((event.clientY - clientRect.top) / (clientRect.bottom - clientRect.top) * canvas.height);
 
-  board.handleClick(clickPos, "right");
+  if (board.handleClick(clickPos, "right")) sfx.play("rotate");
   if (mainState == "initializing") mainState = "prep";
 }
 
