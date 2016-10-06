@@ -36,7 +36,6 @@ Pipe.prototype.update = function () {
         break;
     }
   }
-  console.log(this.fillLevel + " / " + this.maximum);
   if (this.fillLevel >= this.maximum) return 1;
 }
 

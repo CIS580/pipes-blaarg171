@@ -26,8 +26,6 @@ function Board(width, height, tileSize, pipeMax) {
   }
 
   setStartFinish(this);
-  console.log(this.start.direction + " " + this.finish.direction);
-
   this.current = { x: this.start.x, y: this.start.y, direction: this.start.direction };
 }
 

@@ -10,14 +10,14 @@ var background = new Audio();
 var stream = new Audio();
 
 function SFX() {
-  place.src = "assets/place.wav";
-  rotate.src = "assets/rotate.wav";
-  levelUp.src = "assets/levelUp.wav";
-  gameOver.src = "assets/gameOver.wav";
-  background.src = "assets/Steamtech-Mayhem_Looping.mp3";
+  place.src = encodeURI("assets/place.wav");
+  rotate.src = encodeURI("assets/rotate.wav");
+  levelUp.src = encodeURI("assets/levelUp.wav");
+  gameOver.src = encodeURI("assets/gameOver.wav");
+  background.src = encodeURI("assets/Steamtech-Mayhem_Looping.mp3");
   background.loop = true;
-  // background.play();
-  stream.src = "assets/stream.wav";
+  background.play();
+  stream.src = encodeURI("assets/stream.wav");
 }
 
 SFX.prototype.play = function (sound) {
