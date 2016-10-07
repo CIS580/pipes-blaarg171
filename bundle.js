@@ -891,7 +891,7 @@ function SFX() {
   gameOver.src = encodeURI("assets/gameOver.wav");
   background.src = encodeURI("assets/Steamtech-Mayhem_Looping.mp3");
   background.loop = true;
-  // background.play();
+  background.play();
   stream.src = encodeURI("assets/stream.wav");
 }
 
